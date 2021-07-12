@@ -27,10 +27,10 @@ import (
 {{- $bsubject := printf "%s.%s" $fsubject $ssubject }}
 {{- if $isnrpcsvr }}
 const (
-     {{$svc}}4NRPCName = "NRPC4{{$svc}}"
+     {{$svc}}4NRpcName = "NRpc4{{$svc}}"
 )
 
-type {{$svc}}NInterface interface {
+type {{$svc}}NRpc interface {
     {{- range .Methods }}
     {{- $nrpcoptions := nrpcoptions .}}
     {{- $isnrpcfun := $nrpcoptions.Nrpc }}
@@ -40,7 +40,7 @@ type {{$svc}}NInterface interface {
     {{- end }}
 }
 
-func Register{{$svc}}(s *nrpc.Server, in {{$svc}}NInterface, opts ...nevent.ListenOption) error {
+func Register{{$svc}}NRpc(s *nrpc.Server, in {{$svc}}NRpc, opts ...nevent.ListenOption) error {
     {{- range .Methods }}
     {{- $oname := name .Output }}
     {{- $moptions := options . }}
@@ -79,12 +79,12 @@ func Register{{$svc}}(s *nrpc.Server, in {{$svc}}NInterface, opts ...nevent.List
 }
 
 // generete for nrpc client
-type {{ $svc }}NClientImpl struct {
+type {{ $svc }}NRpcClientImpl struct {
 	nc *nevent.Client
     opt []nevent.EmitOption
 }
 
-type {{ $svc }}NClient interface {
+type {{ $svc }}NRpcClient interface {
 {{- range .Methods }}
 {{- $moptions := options . }}
 {{- $msubject := default $moptions.Subject (name .) }}
@@ -97,10 +97,10 @@ type {{ $svc }}NClient interface {
 {{- end }}
 }
 
-func New{{ $svc }}NClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NClient {
+func New{{ $svc }}NRpcClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NRpcClient {
     opList := make([]nevent.EmitOption, 0)
     opList = append(opList, opt ...)
-	return &{{ $svc }}NClientImpl{nc: nc, opt: opList} 
+	return &{{ $svc }}NRpcClientImpl{nc: nc, opt: opList} 
 }
 
 {{- range .Methods }}
@@ -111,7 +111,7 @@ func New{{ $svc }}NClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }
 {{- $isnrpcfun := $nrpcoptions.Nrpc }}
 {{- if $isnrpcfun }}
 
-func (nCli *{{ $svc }}NClientImpl){{ name . }}(ctx context.Context, e *{{ name .Input }}, opts ...grpc.CallOption) (*{{ name .Output }}, error) {
+func (nCli *{{ $svc }}NRpcClientImpl){{ name . }}(ctx context.Context, e *{{ name .Input }}, opts ...grpc.CallOption) (*{{ name .Output }}, error) {
 	msg := nats.NewMsg("{{ $subject }}")
 	data, err := proto.Marshal(e)
 	if err != nil {

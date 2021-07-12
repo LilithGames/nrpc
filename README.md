@@ -19,9 +19,17 @@ $ go get github.com/LilithGames/nrpc/protoc-gen-nrpc
 
 ```
 make example
-cd exmaple/server && go run
-cd example/client && go run
+cd exmaple/server && go build && ./server
+cd example/client && go build && ./client
 ```
+
+## More
+
+read more about rpc details options [nevent](https://github.com/LilithGames/nevent)
+
+
+
+
 
 
 
