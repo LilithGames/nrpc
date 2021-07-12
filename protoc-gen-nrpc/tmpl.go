@@ -27,7 +27,7 @@ import (
 {{- $bsubject := printf "%s.%s" $fsubject $ssubject }}
 {{- if $isnrpcsvr }}
 const (
-     {{$svc}}NServiceName = "NRPC4{{$svc}}"
+     {{$svc}}4NRPCName = "NRPC4{{$svc}}"
 )
 
 type {{$svc}}NInterface interface {
