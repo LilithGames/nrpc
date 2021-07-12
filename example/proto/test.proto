@@ -1,0 +1,49 @@
+syntax = "proto3";
+package proto;
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/descriptor.proto";
+import "proto/nrpc.proto";
+
+option go_package = "github.com/LilithGames/nrpc/example/proto";
+
+message Person {
+  string name = 1;
+  int32 id = 2;
+  string email = 3;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber {
+    string number = 1;
+    PhoneType type = 2;
+  }
+
+  repeated PhoneNumber phones = 4;
+
+  google.protobuf.Timestamp last_updated = 5;
+}
+
+message Company {
+  string name = 1;
+}
+
+
+service Test {
+    // we will only generate service and method with nrpc option
+    option (nrpc.soptions) = {
+        nrpc: true
+    };
+
+    rpc PersonAsk(Person) returns (Company) {
+        option (nrpc.moptions) = {
+            nrpc: true
+        };
+    };
+
+    // this method will not generate nrpc because no nrpc option set
+    rpc PersonTest(Person) returns (Company) {}
+}

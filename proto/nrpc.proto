@@ -1,0 +1,29 @@
+syntax = "proto3";
+package nrpc;
+
+import "google/protobuf/descriptor.proto";
+option go_package = "github.com/LilithGames/nrpc/proto";
+
+message NRPCOption {
+    bool nrpc = 1;
+}
+
+extend google.protobuf.FileOptions {
+  optional NRPCOption foptions = 50740;
+}
+
+extend google.protobuf.ServiceOptions {
+  optional NRPCOption soptions = 51740;
+}
+
+extend google.protobuf.MethodOptions {
+  optional NRPCOption moptions = 52740;
+}
+
+
+
+
+
+
+
+
