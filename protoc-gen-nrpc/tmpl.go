@@ -45,7 +45,7 @@ func Register{{$svc}}NRpc(s *nrpc.Server, in {{$svc}}NRpc, opts ...nevent.Listen
     {{- $oname := name .Output }}
     {{- $moptions := options . }}
     {{- $msubject := default $moptions.Subject (name .) }}
-    {{- $subject := printf "nrpc.%s.%s.%s.%s" $svc $fsubject $ssubject $msubject }}
+    {{- $subject := printf "nrpc.%s.%s.%s" $fsubject $ssubject $msubject }}
     {{- $nrpcoptions := nrpcoptions .}}
     {{- $isnrpcfun := $nrpcoptions.Nrpc }}
 
@@ -86,9 +86,6 @@ type {{ $svc }}NRpcClientImpl struct {
 
 type {{ $svc }}NRpcClient interface {
 {{- range .Methods }}
-{{- $moptions := options . }}
-{{- $msubject := default $moptions.Subject (name .) }}
-{{- $subject := printf "nrpc.%s.%s.%s.%s" $svc $fsubject $ssubject $msubject }}
 {{- $nrpcoptions := nrpcoptions .}}
 {{- $isnrpcfun := $nrpcoptions.Nrpc }}
 {{- if $isnrpcfun }}
