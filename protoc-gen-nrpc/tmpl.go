@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/LilithGames/nevent"
-	pb "github.com/LilithGames/nevent/proto"
 	"github.com/LilithGames/nrpc"
 	"github.com/golang/protobuf/proto"
 	"github.com/nats-io/nats.go"
@@ -77,14 +76,14 @@ func Register{{$svc}}(s *nrpc.Server, in {{$svc}}NInterface, defaultSubNum int, 
 		return bs, nil
 	}
 
-	err := s.RegisterEventHandler("{{ $subject }}", defaultSubNum, GenEh{{ name . }}, opts...)
-    if err != nil {
-        return err
+	{{ name .}}Err := s.RegisterEventHandler("{{ $subject }}", defaultSubNum, GenEh{{ name . }}, opts...)
+    if {{name .}}Err != nil {
+        return {{name .}}Err
     }
     {{- end}}
 
     {{- end }}
-    return err
+    return nil
 }
 
 // generete for nrpc client
