@@ -138,7 +138,7 @@ func (nCli *{{ $svc }}NClientImpl){{ name . }}(ctx context.Context, e *{{ name .
 	if err != nil {
 		return nil, fmt.Errorf("answer unmarshal error %w", err)
 	}
-    if err := resp.Vaildate(); err != nil {
+    if err := answer.Vaildate(); err != nil {
         return nil, fmt.Errorf("rsp validate fail %w", validErr)
     }
 	return answer, nil
