@@ -53,11 +53,11 @@ func Register{{$svc}}NRpc(s *nrpc.Server, in {{$svc}}NInterface, opts ...nevent.
 		data := new({{name .Input }})
 		err := proto.Unmarshal(m.Data, data)
 		if err != nil {
-			return nil, fmt.Errorf("server unmarshal ask: %w", err)
+			return nil, fmt.Errorf("nrpc svr {{$subject}} unmarshal ask: %w", err)
 		}
 
-        if err := data.Validate; err != nil {
-            return nil, fmt.Errorf("req data validate fail: %w", err)
+        if err := data.Validate(); err != nil {
+            return nil, fmt.Errorf("nrpc svr {{$subject}} req validate fail: %w", err)
         }
 
 		resp, err := in.{{ name . }}(ctx, data)
@@ -66,17 +66,17 @@ func Register{{$svc}}NRpc(s *nrpc.Server, in {{$svc}}NInterface, opts ...nevent.
 		}
 
         if err := resp.Validate(); err != nil {
-            return nil, fmt.Errorf("rsp data validate fail: %w", err)
+            return nil, fmt.Errorf("nrpc svr {{$subject}} rsp data validate fail: %w", err)
         }
 
 		bs, err := proto.Marshal(resp)
 		if err != nil {
-			return nil, fmt.Errorf("server marshal answer: %w", err)
+			return nil, fmt.Errorf("nrpc svr {{$subject}} marshal answer: %w", err)
 		}
 		return bs, nil
 	}
 
-	{{ name .}}Err := s.RegisterEventHandler("{{ $subject }}", GenEh{{ name . }}, opts...)
+	{{ name .}}Err := s.RegisterEventHandler("{{$subject}}", GenEh{{ name . }}, opts...)
     if {{name .}}Err != nil {
         return {{name .}}Err
     }
@@ -92,7 +92,7 @@ type {{ $svc }}NClientImpl struct {
     opt []nevent.EmitOption
 }
 
-type {{ $svc }}NClient interface {
+type {{ $svc }}NRpcClient interface {
 {{- range .Methods }}
 {{- $moptions := options . }}
 {{- $msubject := default $moptions.Subject (name .) }}
@@ -105,7 +105,7 @@ type {{ $svc }}NClient interface {
 {{- end }}
 }
 
-func New{{ $svc }}NRpcClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NClient {
+func New{{ $svc }}NRpcClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NRpcClient {
     opList := make([]nevent.EmitOption, 0)
     opList = append(opList, opt ...)
 	return &{{ $svc }}NClientImpl{nc: nc, opt: opList} 
@@ -126,20 +126,20 @@ func (nCli *{{ $svc }}NClientImpl){{ name . }}(ctx context.Context, e *{{ name .
     }
 	data, err := proto.Marshal(e)
 	if err != nil {
-		return nil, fmt.Errorf("ask marshal error %w", err)
+		return nil, fmt.Errorf("ask {{$subject}} marshal error %w", err)
 	}
 	msg.Data = data
 	resp, err := nCli.nc.Ask(ctx, msg, nCli.opt ...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ask {{$subject}} %w", err)
 	}
 	answer := new({{ name .Output }})
 	err = proto.Unmarshal(resp, answer)
 	if err != nil {
-		return nil, fmt.Errorf("answer unmarshal error %w", err)
+		return nil, fmt.Errorf("answer {{$subject}} unmarshal error %w", err)
 	}
     if err := answer.Validate(); err != nil {
-        return nil, fmt.Errorf("rsp validate fail %w", err)
+        return nil, fmt.Errorf("ask {{$subject}} response validate fail %w", err)
     }
 	return answer, nil
 }

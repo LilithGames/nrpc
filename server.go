@@ -72,6 +72,7 @@ func (svr *Server) RegisterEventHandler(ev string, handler nevent.EventHandler, 
 			Opts:    make([]nevent.ListenOption, 0),
 			Handler: eventHandlerWapper(procStatus, handler),
 		}
+		procStatus.Opts = append(procStatus.Opts, opts...)
 		svr.Status[ev] = procStatus
 	}
 
