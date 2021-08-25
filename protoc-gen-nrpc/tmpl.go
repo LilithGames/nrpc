@@ -122,7 +122,7 @@ func New{{ $svc }}NClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }
 func (nCli *{{ $svc }}NClientImpl){{ name . }}(ctx context.Context, e *{{ name .Input }}, opts ...grpc.CallOption) (*{{ name .Output }}, error) {
 	msg := nats.NewMsg("{{ $subject }}")
     if err := e.Validate(); err != nil {
-        return nil, fmt.Errorf("ask event invalidate fail %w", vaildErr)
+        return nil, fmt.Errorf("ask event invalidate fail %w", err)
     }
 	data, err := proto.Marshal(e)
 	if err != nil {
@@ -138,8 +138,8 @@ func (nCli *{{ $svc }}NClientImpl){{ name . }}(ctx context.Context, e *{{ name .
 	if err != nil {
 		return nil, fmt.Errorf("answer unmarshal error %w", err)
 	}
-    if err := answer.Vaildate(); err != nil {
-        return nil, fmt.Errorf("rsp validate fail %w", validErr)
+    if err := answer.Validate(); err != nil {
+        return nil, fmt.Errorf("rsp validate fail %w", err)
     }
 	return answer, nil
 }
