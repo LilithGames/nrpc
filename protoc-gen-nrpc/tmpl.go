@@ -92,7 +92,7 @@ type {{ $svc }}NClientImpl struct {
     opt []nevent.EmitOption
 }
 
-type {{ $svc }}NClient interface {
+type {{ $svc }}NRpcClient interface {
 {{- range .Methods }}
 {{- $moptions := options . }}
 {{- $msubject := default $moptions.Subject (name .) }}
@@ -105,7 +105,7 @@ type {{ $svc }}NClient interface {
 {{- end }}
 }
 
-func New{{ $svc }}NRpcClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NClient {
+func New{{ $svc }}NRpcClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NRpcClient {
     opList := make([]nevent.EmitOption, 0)
     opList = append(opList, opt ...)
 	return &{{ $svc }}NClientImpl{nc: nc, opt: opList} 
