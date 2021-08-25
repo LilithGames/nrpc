@@ -33,22 +33,23 @@ func (p *ProcessorStatus) Stop() error {
 }
 
 type Server struct {
-	EventSvr *nevent.Server
-	Status   map[string]*ProcessorStatus
-	mutex    sync.Mutex
+	EventSvr      *nevent.Server
+	Status        map[string]*ProcessorStatus
+	DefaultSubNum int
+	mutex         sync.Mutex
 }
 
 type Validator interface {
 	Validate() error
 }
 
-func NewServer(nc *nats.Conn, opts ...nevent.ServerOption) (*Server, error) {
+func NewServer(nc *nats.Conn, subNum int, opts ...nevent.ServerOption) (*Server, error) {
 	ns, err := nevent.NewServer(nc, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("nrpc create neventsvr %w", err)
 	}
 	status := make(map[string]*ProcessorStatus)
-	return &Server{EventSvr: ns, Status: status}, nil
+	return &Server{EventSvr: ns, Status: status, DefaultSubNum: subNum}, nil
 }
 
 func eventHandlerWapper(procStatus *ProcessorStatus, handler nevent.EventHandler) nevent.EventHandler {
@@ -59,7 +60,7 @@ func eventHandlerWapper(procStatus *ProcessorStatus, handler nevent.EventHandler
 	}
 }
 
-func (svr *Server) RegisterEventHandler(ev string, defaultNum int, handler nevent.EventHandler, opts ...nevent.ListenOption) error {
+func (svr *Server) RegisterEventHandler(ev string, handler nevent.EventHandler, opts ...nevent.ListenOption) error {
 	svr.mutex.Lock()
 	defer svr.mutex.Unlock()
 
@@ -74,7 +75,7 @@ func (svr *Server) RegisterEventHandler(ev string, defaultNum int, handler neven
 		svr.Status[ev] = procStatus
 	}
 
-	for i := 0; i < defaultNum; i++ {
+	for i := 0; i < svr.DefaultSubNum; i++ {
 		sub, err := svr.EventSvr.ListenEvent(ev, pb.EventType_Ask, handler, opts...)
 		if err != nil {
 			return fmt.Errorf("nevent listen %s %w", ev, err)

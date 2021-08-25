@@ -26,7 +26,7 @@ import (
 {{- $bsubject := printf "%s.%s" $fsubject $ssubject }}
 {{- if $isnrpcsvr }}
 const (
-     {{$svc}}NServiceName = "NRPC4{{$svc}}"
+     {{$svc}}4NRpcName = "NRPC4{{$svc}}"
 )
 
 type {{$svc}}NInterface interface {
@@ -39,7 +39,7 @@ type {{$svc}}NInterface interface {
     {{- end }}
 }
 
-func Register{{$svc}}(s *nrpc.Server, in {{$svc}}NInterface, defaultSubNum int, opts ...nevent.ListenOption) error {
+func Register{{$svc}}NRpc(s *nrpc.Server, in {{$svc}}NInterface, opts ...nevent.ListenOption) error {
     {{- range .Methods }}
     {{- $oname := name .Output }}
     {{- $moptions := options . }}
@@ -76,7 +76,7 @@ func Register{{$svc}}(s *nrpc.Server, in {{$svc}}NInterface, defaultSubNum int, 
 		return bs, nil
 	}
 
-	{{ name .}}Err := s.RegisterEventHandler("{{ $subject }}", defaultSubNum, GenEh{{ name . }}, opts...)
+	{{ name .}}Err := s.RegisterEventHandler("{{ $subject }}", GenEh{{ name . }}, opts...)
     if {{name .}}Err != nil {
         return {{name .}}Err
     }
@@ -105,7 +105,7 @@ type {{ $svc }}NClient interface {
 {{- end }}
 }
 
-func New{{ $svc }}NClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NClient {
+func New{{ $svc }}NRpcClient(nc *nevent.Client, opt ...nevent.EmitOption) {{ $svc }}NClient {
     opList := make([]nevent.EmitOption, 0)
     opList = append(opList, opt ...)
 	return &{{ $svc }}NClientImpl{nc: nc, opt: opList} 
