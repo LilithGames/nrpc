@@ -141,6 +141,7 @@ func (nCli *{{ $svc }}NClientImpl){{ name . }}(ctx context.Context, e *{{ name .
     if err := answer.Validate(); err != nil {
         return nil, fmt.Errorf("ask {{$subject}} response validate fail %w", err)
     }
+
 	return answer, nil
 }
 {{- end }}
